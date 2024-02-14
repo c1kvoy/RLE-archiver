@@ -1,3 +1,7 @@
+import tkinter as tk
+from tkinter import filedialog
+
+# Функция для декодирования строки
 def txtdecode(s):
     output = ""
     i = 0
@@ -11,6 +15,7 @@ def txtdecode(s):
             i += 1
     return output
 
+# Функция для кодирования строки
 def txtencode(s):
     encoded = ""
     count = 1
@@ -29,8 +34,27 @@ def txtencode(s):
         encoded += s[-1]
     return encoded
 
-s = input("Введите строку для кодирования: ")
-encoded_string = txtencode(s)
-print("Закодированная строка:", encoded_string)
-decoded_string = txtdecode(encoded_string)
-print("Декодированная строка:", decoded_string)
+
+def write_to_file(file_path, content):
+    with open(file_path, 'w') as file:
+        file.write(content) 
+    print("Строка успешно записана в файл.")
+
+
+def filework():
+    file_path = filedialog.askopenfilename()
+    with open(file_path, 'r') as file:
+            content = file.read()
+    encoded_string = txtencode(content)
+    write_to_file(file_path, encoded_string)
+
+# main 
+
+root = tk.Tk()
+root.geometry(f"400x500+100+200")
+root.title("Архиватор RLE 0.1")
+label = tk.Label(text="encode txt or bmp file")
+label.pack()
+file_take_button = tk.Button(root, text="Choose file", command=filework)
+file_take_button.pack()
+root.mainloop()
