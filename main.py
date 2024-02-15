@@ -34,27 +34,39 @@ def txtencode(s):
         encoded += s[-1]
     return encoded
 
-
-def write_to_file(file_path, content):
-    with open(file_path, 'w') as file:
-        file.write(content) 
-    print("Строка успешно записана в файл.")
-
-
-def filework():
+def filewritting_encodedstr():
     file_path = filedialog.askopenfilename()
     with open(file_path, 'r') as file:
-            content = file.read()
+        content = file.read()
     encoded_string = txtencode(content)
-    write_to_file(file_path, encoded_string)
+    with open(file_path+".rle", 'w') as file:
+        file.write(encoded_string) 
+    print("Строка успешно записана в файл.")
 
-# main 
+def filewritting_decodedstr():
+    file_path = filedialog.askopenfilename()
+    with open(file_path, 'r') as file:
+        content = file.read()
+    dencoded_string = txtdecode(content)
+    with open(file_path+".rle", 'w') as file:
+        file.write(dencoded_string) 
+    print("Строка успешно записана в файл.")
+# main
 
 root = tk.Tk()
-root.geometry(f"400x500+100+200")
+root.geometry("400x500+100+200")
 root.title("Архиватор RLE 0.1")
-label = tk.Label(text="encode txt or bmp file")
-label.pack()
-file_take_button = tk.Button(root, text="Choose file", command=filework)
-file_take_button.pack()
+
+labelencode = tk.Label(root, text="encode txt or bmp file")  # Указываем родителя
+labelencode.pack()
+
+compressbutton = tk.Button(root, text="Choose file", command=filewritting_encodedstr)
+compressbutton.pack()
+
+labeldecode = tk.Label(root, text="decode txt or bmp file")  # Указываем родителя
+labeldecode.pack()
+
+decompressbutton = tk.Button(root, text="Choose file", command=filewritting_decodedstr)
+decompressbutton.pack()
+
 root.mainloop()
