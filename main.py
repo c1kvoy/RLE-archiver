@@ -1,4 +1,4 @@
-import tkinter as tk
+from tkinter import *
 from tkinter import filedialog
 
 # Функция для декодирования строки
@@ -53,20 +53,20 @@ def filewritting_decodedstr():
     print("Строка успешно записана в файл.")
 # main
 
-root = tk.Tk()
+root = Tk()
 root.geometry("400x500+100+200")
 root.title("Архиватор RLE 0.1")
 
-labelencode = tk.Label(root, text="encode txt or bmp file")  # Указываем родителя
+labelencode = Label(text="encode txt or bmp file", background="#FFCDD2")  # Указываем родителя
 labelencode.pack()
 
-compressbutton = tk.Button(root, text="Choose file", command=filewritting_encodedstr)
+compressbutton = Button(text="Choose file", command=filewritting_encodedstr)
 compressbutton.pack()
 
-labeldecode = tk.Label(root, text="decode txt or bmp file")  # Указываем родителя
+labeldecode = Label(text="decode txt or bmp file", background="#FFCDD2")  # Указываем родителя
 labeldecode.pack()
 
-decompressbutton = tk.Button(root, text="Choose file", command=filewritting_decodedstr)
+decompressbutton = Button(text="Choose file", command=filewritting_decodedstr)
 decompressbutton.pack()
 
 root.mainloop()
