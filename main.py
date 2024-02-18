@@ -7,13 +7,18 @@ def txtdecode(s):
     i = 0
     while i < len(s):
         if i < len(s) - 1 and s[i + 1].isdigit():
-            count = int(s[i + 1])
-            output += count * s[i]
-            i += 2
+            count = ""
+            j = i + 1
+            while j < len(s) and s[j].isdigit(): 
+                count += s[j]
+                j += 1
+            output += int(count) * s[i]
+            i = j
         else:
             output += s[i]
             i += 1
     return output
+
 
 # Функция для кодирования строки
 def txtencode(s):
@@ -39,7 +44,14 @@ def filewritting_encodedstr():
     with open(file_path, 'r') as file:
         content = file.read()
     encoded_string = txtencode(content)
-    with open(file_path+".rle", 'w') as file:
+    file_path = filedialog.asksaveasfilename(
+        filetypes=(("TXT files", "*.txt"),
+                   ("HTML files", "*.html;*.htm"),
+                   ("All files", "*.*")),
+        defaultextension=".txt"
+        )
+    
+    with open(file_path, 'w') as file:
         file.write(encoded_string) 
     print("Строка успешно записана в файл.")
 
@@ -48,22 +60,31 @@ def filewritting_decodedstr():
     with open(file_path, 'r') as file:
         content = file.read()
     dencoded_string = txtdecode(content)
-    with open(file_path+".rle", 'w') as file:
+    file_path = filedialog.asksaveasfilename(
+        filetypes=(("TXT files", "*.txt"),
+                   ("HTML files", "*.html;*.htm"),
+                   ("All files", "*.*")),
+        defaultextension=".txt"
+        )
+    print(file_path)
+
+    with open(file_path, 'w') as file:
         file.write(dencoded_string) 
-    print("Строка успешно записана в файл.")
+    print("Строка успешно расшифрована в файл.")
+
 # main
 
 root = Tk()
 root.geometry("400x500+100+200")
 root.title("Архиватор RLE 0.1")
 
-labelencode = Label(text="encode txt or bmp file", background="#FFCDD2")  # Указываем родителя
+labelencode = Label(text="encode txt or bmp file", background="#FFCDD2",font='Times 30',bg='grey')  # Указываем родителя
 labelencode.pack()
 
 compressbutton = Button(text="Choose file", command=filewritting_encodedstr)
 compressbutton.pack()
 
-labeldecode = Label(text="decode txt or bmp file", background="#FFCDD2")  # Указываем родителя
+labeldecode = Label(text="decode txt or bmp file", background="#FFCDD2",font='Times 30',bg='grey')  # Указываем родителя
 labeldecode.pack()
 
 decompressbutton = Button(text="Choose file", command=filewritting_decodedstr)
