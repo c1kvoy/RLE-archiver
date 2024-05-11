@@ -89,25 +89,6 @@ def get_resolution(data):
         data = data[:-1]
     data = data[:-2]
     return width,height,data
-def bmp_to_bit(path):
-    image = Image.open(path).convert("1")
-    pixels = list(image.getdata())
-    bit_string = ""
-    for pixel in pixels:
-        bit_string += "1" if pixel == 255 else "0"
-    chard = bit_string[-1]
-    while bit_string[len(bit_string)-1] == chard:
-        bit_string=bit_string[:-1]
-    return bit_string
-
-def bit_to_bmp(bit_string, width, height):
-    image = Image.new("1", (width, height))
-    pixels = list(image.getdata())
-    bits = [int(bit) for bit in bit_string]
-    for i, bit in enumerate(bits):
-        pixels[i] = 255 if bit == 1 else 0
-    image.putdata(pixels)
-    return image
 
 def filewritting_encodedstr():
     file_path = filedialog.askopenfilename()
