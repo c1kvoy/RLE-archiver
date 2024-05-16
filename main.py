@@ -1,7 +1,9 @@
 import customtkinter
 from customtkinter import filedialog
 from PIL import Image
+
 # Функция для декодирования строки
+
 def bmp_encode(pixels):
     result = ""
     for row in pixels:
@@ -74,78 +76,95 @@ def txtencode(s):
     return encoded_str
 
 def get_resolution(data):
-    height = ""
-    width = ""
-    i = len(data)-2
-    data = data[:-1]
-    while data[i]!='|':
-        width = data[i] + width
-        i+=-1
+    try:
+        height = ""
+        width = ""
+        i = len(data)-2
         data = data[:-1]
-    i-=1
-    while data[i]!='|':
-        height = data[i] + height
-        i+=-1
-        data = data[:-1]
-    data = data[:-2]
-    return width,height,data
-
+        while data[i]!='|':
+            width = data[i] + width
+            i+=-1
+            data = data[:-1]
+        i-=1
+        while data[i]!='|':
+            height = data[i] + height
+            i+=-1
+            data = data[:-1]
+        data = data[:-2]
+        return width,height,data
+    except IndexError:
+        Error_window(IndexError)
 def filewritting_encodedstr():
-    file_path = filedialog.askopenfilename()
-    extension = file_path.split(".")
+    try:
+        file_path = filedialog.askopenfilename()
+        extension = file_path.split(".")
 
-    if extension[-1] == "txt":
+        if extension[-1] == "txt":
+            with open(file_path, 'r') as file:
+                content = file.read()
+            encoded_string = txtencode(content)
+        elif extension[-1] == "bmp":
+            image = Image.open(file_path)
+            image = image.convert("RGB")
+            pixels = list(image.getdata())
+            encoded_string = bmp_encode(pixels)
+            width, height = image.size
+            encoded_string += "|"+ str(width) + "|"+ str(height) + "|"
+
+        file_path = filedialog.asksaveasfilename(
+            filetypes=(("RLE files", "*.rle"),
+                       ("HTML files", "*.html;*.htm"),
+                       ("TXT files", "*.txt"),
+                       ("All files", "*.*")),
+            defaultextension=".rle"
+        )
+
+        with open(file_path, 'w') as file:
+            file.write(encoded_string)
+        print("Строка успешно записана в файл.")
+    except Exception:
+        Error_window("Encode Error")
+def filewritting_decodedstr():
+    try:
+        file_path = filedialog.askopenfilename()
         with open(file_path, 'r') as file:
             content = file.read()
-        encoded_string = txtencode(content)
-    elif extension[-1] == "bmp":
-        image = Image.open(file_path)
-        image = image.convert("RGB")
-        pixels = list(image.getdata())
-        encoded_string = bmp_encode(pixels)
-        width, height = image.size
-        encoded_string += "|"+ str(width) + "|"+ str(height) + "|"
 
-    file_path = filedialog.asksaveasfilename(
-        filetypes=(("RLE files", "*.rle"),
-                   ("HTML files", "*.html;*.htm"),
-                   ("TXT files", "*.txt"),
-                   ("All files", "*.*")),
-        defaultextension=".rle"
-    )
+        file_path = filedialog.asksaveasfilename(
+            filetypes=(("TXT files", "*.txt"),
+                       ("HTML files", "*.html;*.htm"),
+                       ("BMP files", "*.bmp"),
+                       ("All files", "*.*")),
+            defaultextension=".txt"
+        )
+        extension = file_path.split(".")
+        if extension[-1] == "bmp":
+            width, height, content = get_resolution(content)
+            width = int(width)
+            height = int(height)
+            pixels = bmp_decode(content)
+            image = Image.new("RGB", (width, height))
+            image.putdata(pixels)
+            image.save(file_path)
+        else:
+            decoded_string = txtdecode(content)
+            with open(file_path, 'w') as file:
+                file.write(decoded_string)
+        print("Строка успешно расшифрована в файл.")
+    except Exception:
+        Error_window("Decode Error")
 
-    with open(file_path, 'w') as file:
-        file.write(encoded_string)
-    print("Строка успешно записана в файл.")
-
-def filewritting_decodedstr():
-    file_path = filedialog.askopenfilename()
-    with open(file_path, 'r') as file:
-        content = file.read()
-
-    file_path = filedialog.asksaveasfilename(
-        filetypes=(("TXT files", "*.txt"),
-                   ("HTML files", "*.html;*.htm"),
-                   ("BMP files", "*.bmp"),
-                   ("All files", "*.*")),
-        defaultextension=".txt"
-    )
-    extension = file_path.split(".")
-    if extension[-1] == "bmp":
-        width, height, content = get_resolution(content)
-        width = int(width)
-        height = int(height)
-        pixels = bmp_decode(content)
-        image = Image.new("RGB", (width, height))
-        image.putdata(pixels)
-        image.save(file_path)
-    else:
-        decoded_string = txtdecode(content)
-        with open(file_path, 'w') as file:
-            file.write(decoded_string)
-    print("Строка успешно расшифрована в файл.")
-
-
+def Error_window(Error):
+    popup_Error = customtkinter.CTkToplevel()
+    popup_Error.geometry("400x400")
+    popup_Error.title("Error")
+    Error_label = customtkinter.CTkLabel(popup_Error, text=Error)
+    Error_label.pack()
+    Errorbutton = customtkinter.CTkButton(master=popup_Error, text="ok")
+    Errorbutton.configure(command=popup_Error.destroy)
+    Errorbutton.place(x=300,y=100)
+    Errorbutton.pack()
+    popup_Error.mainloop()
 
 root = customtkinter.CTk()
 root.geometry("400x500+100+200")
