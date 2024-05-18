@@ -2,6 +2,7 @@ import customtkinter
 from customtkinter import filedialog
 from PIL import Image
 
+
 # Функция для декодирования строки
 
 def bmp_encode(pixels):
@@ -13,17 +14,16 @@ def bmp_encode(pixels):
     results = result[:-1]
     results = results.split(' ')
     count = 1
-    flag = 1
     encoded_string = ""
-    for i in range(len(results)-1):
-        if results[i] == results[i+1]:
-            count+=1
+    for i in range(len(results) - 1):
+        if results[i] == results[i + 1]:
+            count += 1
         else:
-            encoded_string+=str(count)+'x'+results[i]+' '
-            flag = 0
+            encoded_string += str(count) + 'x' + results[i] + ' '
             count = 1
     encoded_string += str(count) + 'x' + results[-1]
     return encoded_string
+
 
 def bmp_decode(encoded_string):
     colors = []
@@ -31,12 +31,11 @@ def bmp_decode(encoded_string):
     for i in range(len(encoded_string)):
         count = ""
         for j in range(len(encoded_string[i])):
-            if encoded_string[i][j]!='x':
+            if encoded_string[i][j] != 'x':
                 count += encoded_string[i][j]
             else:
                 break
-        encoded_string[i] = encoded_string[i][len(count)+1:]
-        t = 1
+        encoded_string[i] = encoded_string[i][len(count) + 1:]
         for t in range(int(count)):
             decimal_value = int(encoded_string[i], 16)
             r = decimal_value >> 16
@@ -44,6 +43,8 @@ def bmp_decode(encoded_string):
             b = decimal_value & 0xFF
             colors.append((r, g, b))
     return colors
+
+
 def txtdecode(s):
     decoded_str = ""
     i = 0
@@ -57,6 +58,7 @@ def txtdecode(s):
         decoded_str += char * int(count)
         i = j + 1
     return decoded_str
+
 
 # Функция для кодирования строки
 def txtencode(s):
@@ -75,30 +77,33 @@ def txtencode(s):
 
     return encoded_str
 
+
 def get_resolution(data):
     try:
         height = ""
         width = ""
-        i = len(data)-2
+        i = len(data) - 2
         data = data[:-1]
-        while data[i]!='|':
+        while data[i] != '|':
             width = data[i] + width
-            i+=-1
+            i += -1
             data = data[:-1]
-        i-=1
-        while data[i]!='|':
+        i -= 1
+        while data[i] != '|':
             height = data[i] + height
-            i+=-1
+            i += -1
             data = data[:-1]
         data = data[:-2]
-        return width,height,data
+        return width, height, data
     except IndexError:
-        Error_window(IndexError)
+        error_window(IndexError)
+
+
 def filewritting_encodedstr():
     try:
+        encoded_string = ""
         file_path = filedialog.askopenfilename()
         extension = file_path.split(".")
-
         if extension[-1] == "txt":
             with open(file_path, 'r') as file:
                 content = file.read()
@@ -109,7 +114,7 @@ def filewritting_encodedstr():
             pixels = list(image.getdata())
             encoded_string = bmp_encode(pixels)
             width, height = image.size
-            encoded_string += "|"+ str(width) + "|"+ str(height) + "|"
+            encoded_string += "|" + str(width) + "|" + str(height) + "|"
 
         file_path = filedialog.asksaveasfilename(
             filetypes=(("RLE files", "*.rle"),
@@ -123,7 +128,9 @@ def filewritting_encodedstr():
             file.write(encoded_string)
         print("Строка успешно записана в файл.")
     except Exception:
-        Error_window("Encode Error")
+        error_window("Encode Error")
+
+
 def filewritting_decodedstr():
     try:
         file_path = filedialog.askopenfilename()
@@ -143,7 +150,7 @@ def filewritting_decodedstr():
             width = int(width)
             height = int(height)
             pixels = bmp_decode(content)
-            image = Image.new("RGB", (width, height))
+            image = Image.new("RGB", (height, width))
             image.putdata(pixels)
             image.save(file_path)
         else:
@@ -152,19 +159,21 @@ def filewritting_decodedstr():
                 file.write(decoded_string)
         print("Строка успешно расшифрована в файл.")
     except Exception:
-        Error_window("Decode Error")
+        error_window("Decode Error")
 
-def Error_window(Error):
-    popup_Error = customtkinter.CTkToplevel()
-    popup_Error.geometry("400x400")
-    popup_Error.title("Error")
-    Error_label = customtkinter.CTkLabel(popup_Error, text=Error)
-    Error_label.pack()
-    Errorbutton = customtkinter.CTkButton(master=popup_Error, text="ok")
-    Errorbutton.configure(command=popup_Error.destroy)
-    Errorbutton.place(x=300,y=100)
-    Errorbutton.pack()
-    popup_Error.mainloop()
+
+def error_window(errortext):
+    popup_error = customtkinter.CTkToplevel()
+    popup_error.geometry("400x400")
+    popup_error.title("Error")
+    error_label = customtkinter.CTkLabel(popup_error, text=errortext)
+    error_label.pack()
+    errorbutton = customtkinter.CTkButton(master=popup_error, text="ok")
+    errorbutton.configure(command=popup_error.destroy)
+    errorbutton.place(x=300, y=100)
+    errorbutton.pack()
+    popup_error.mainloop()
+
 
 root = customtkinter.CTk()
 root.geometry("400x500+100+200")
